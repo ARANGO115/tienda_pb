@@ -70,4 +70,21 @@ describe('UsuariosService registration', () => {
       }),
     ).rejects.toThrow(InternalServerErrorException);
   });
+
+  it('updates a user role when requested by an administrator', async () => {
+    const adminRole = { id: 3, nombre: 'admin' } as RolEntity;
+    usuariosRepository.findOne.mockResolvedValue(usuarioGuardado);
+    rolService.findOne.mockResolvedValue(adminRole);
+    usuariosRepository.save.mockImplementation((user) =>
+      Promise.resolve(user as UsuarioEntity),
+    );
+
+    const result = await service.updateRole(usuarioGuardado.id, adminRole.id);
+
+    expect(rolService.findOne).toHaveBeenCalledWith(adminRole.id);
+    expect(usuariosRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({ rolId: adminRole.id, rol: adminRole }),
+    );
+    expect(result.user.rol.nombre).toBe('admin');
+  });
 });

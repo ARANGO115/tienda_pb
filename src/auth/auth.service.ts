@@ -16,10 +16,18 @@ export class AuthService {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(registerDto.password, saltRounds);
 
-    const newUser = await this.usuariosService.createForRegistration({
-      ...registerDto,
-      password: hashedPassword,
-    });
+    const { rolId, ...userData } = registerDto;
+    const newUser =
+      rolId === undefined
+        ? await this.usuariosService.createForRegistration({
+            ...userData,
+            password: hashedPassword,
+          })
+        : await this.usuariosService.create({
+            ...userData,
+            password: hashedPassword,
+            rolId,
+          });
 
     return {
       message: 'Usuario registrado exitosamente',

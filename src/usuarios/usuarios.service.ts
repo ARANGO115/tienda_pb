@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateUsuarioDto } from './dto/create-usuario.dto';
 import { UsuarioEntity } from './entities/usuario.entity';
@@ -57,6 +58,31 @@ export class UsuariosService {
     }
 
     return this.persistUser({ ...createUsuarioDto, rolId: rol.id }, rol);
+  }
+
+  async updateRole(id: number, rolId: number) {
+    const usuario = await this.findOne(id);
+    if (!usuario) {
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
+    }
+
+    const rol = await this.rolService.findOne(rolId);
+    usuario.rolId = rol.id;
+    usuario.rol = rol;
+
+    const updatedUser = await this.usuariosRepository.save(usuario);
+
+    return {
+      message: 'Rol del usuario actualizado exitosamente',
+      user: {
+        id: updatedUser.id,
+        nombre: updatedUser.nombre,
+        email: updatedUser.email,
+        activo: updatedUser.activo,
+        rolId: updatedUser.rolId,
+        rol: updatedUser.rol,
+      },
+    };
   }
 
   private async persistUser(

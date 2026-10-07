@@ -53,6 +53,16 @@ de `/api/roles`, requieren autenticación JWT y el rol `admin`. Las consultas
 `GET` de productos y categorías permanecen públicas. El decorador `@Roles()`
 declara los roles permitidos y `RolesGuard` los lee mediante `Reflector`.
 
+Un administrador autenticado puede cambiar el rol de una cuenta desde
+`PATCH /api/usuarios/:id/rol`, enviando `{ "rolId": 2 }` en el cuerpo JSON. El
+ID debe corresponder al rol deseado (consúltalo en la tabla `roles`). Esta ruta
+requiere JWT y rol `admin`.
+
+Para pruebas locales, el registro también acepta opcionalmente `rolId` y asigna
+ese rol a la cuenta nueva. Omitirlo crea un usuario estándar. No habilites la
+selección pública de roles en producción: permitiría que cualquiera se registre
+como administrador.
+
 ## Project setup
 
 ```bash

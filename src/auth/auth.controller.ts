@@ -31,4 +31,4 @@ export class AuthController {
             user: usuario
         }
     }
-}
+} 
